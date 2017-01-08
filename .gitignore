@@ -1,0 +1,4 @@
+# Extra project files
+.metadata
+.idea
+*.iml
