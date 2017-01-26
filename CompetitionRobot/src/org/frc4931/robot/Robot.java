@@ -1,10 +1,12 @@
 /* Created Sat Jan 07 19:18:14 CST 2017 */
 package org.frc4931.robot;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import org.frc4931.robot.drive.Drivetrain;
+import edu.wpi.first.wpilibj.SPI;
 import org.strongback.Strongback;
-import org.strongback.components.AngleSensor;
+import org.strongback.components.Compass;
 import org.strongback.components.Switch;
 import org.strongback.components.TalonSRX;
 import org.strongback.components.ui.ContinuousRange;
@@ -46,7 +48,8 @@ public class Robot extends IterativeRobot {
         TalonController leftRearMotor = Hardware.Controllers.talonController(LEFT_REAR_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
         TalonController rightFrontMotor = Hardware.Controllers.talonController(RIGHT_FRONT_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
         TalonController rightRearMotor = Hardware.Controllers.talonController(RIGHT_REAR_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
-        AngleSensor gyro = AngleSensor.create(() -> 0.0);
+        AHRS navX = new AHRS(SPI.Port.kMXP);
+        Compass compass = Compass.create(navX::getFusedHeading);
 
         leftFrontMotor.setFeedbackDevice(TalonSRX.FeedbackDevice.MAGNETIC_ENCODER_RELATIVE)
                 .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
@@ -61,8 +64,8 @@ public class Robot extends IterativeRobot {
                 .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
                 .setControlMode(TalonController.ControlMode.SPEED);
 
-        MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, gyro);
-        drivetrain = new Drivetrain(drive);
+        MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
+        drivetrain = new Drivetrain(drive, compass);
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         driveX = flightStick.getRoll();
