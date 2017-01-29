@@ -11,6 +11,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.drive.MecanumDrive;
+import org.strongback.function.DoubleToDoubleFunction;
 import org.strongback.hardware.Hardware;
 
 public class Robot extends IterativeRobot {
@@ -42,9 +43,10 @@ public class Robot extends IterativeRobot {
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
-        driveX = flightStick.getRoll().scale(throttle);
-        driveY = flightStick.getPitch().scale(throttle);
-        driveRotation = flightStick.getYaw().scale(throttle);
+        DoubleToDoubleFunction squarer = (x) -> x * x;
+        driveX = flightStick.getRoll().map(squarer).scale(throttle);
+        driveY = flightStick.getPitch().map(squarer).scale(throttle);
+        driveRotation = flightStick.getYaw().map(squarer).scale(throttle);
     }
 
     @Override
