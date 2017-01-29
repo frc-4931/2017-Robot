@@ -1,18 +1,15 @@
 /* Created Sat Jan 07 19:18:14 CST 2017 */
 package org.frc4931.robot;
 
-import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.DoubleSupplier;
 import org.frc4931.robot.drive.Drivetrain;
-import edu.wpi.first.wpilibj.SPI;
 import org.strongback.Strongback;
 import org.strongback.components.Compass;
-import org.strongback.components.Switch;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.Motor;
 import org.strongback.components.ui.ContinuousRange;
-import org.strongback.components.ui.DirectionalAxis;
 import org.strongback.components.ui.FlightStick;
-import org.strongback.control.TalonController;
 import org.strongback.drive.MecanumDrive;
 import org.strongback.hardware.Hardware;
 
@@ -24,55 +21,30 @@ public class Robot extends IterativeRobot {
 
     private static final int FLIGHT_STICK_PORT = 0;
 
-    /* Stages:
-     *
-     * 4 pul : 360 deg CTRE Magnetic Encoder
-     * 7 : 1 VersaPlanetary Gearbox
-     */
-    private static final double DRIVE_PULSES_PER_DEGREE = 0.01111111111111111;
-    private static final double DRIVE_P_GAIN = 0.0;
-    private static final double DRIVE_I_GAIN = 0.0;
-    private static final double DRIVE_D_GAIN = 0.0;
-
     private Drivetrain drivetrain;
 
     private ContinuousRange driveX;
     private ContinuousRange driveY;
     private ContinuousRange driveRotation;
-    private Switch relativeEnable;
-    private DirectionalAxis trimPot;
 
     @Override
     public void robotInit() {
-        TalonController leftFrontMotor = Hardware.Controllers.talonController(LEFT_FRONT_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
-        TalonController leftRearMotor = Hardware.Controllers.talonController(LEFT_REAR_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
-        TalonController rightFrontMotor = Hardware.Controllers.talonController(RIGHT_FRONT_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
-        TalonController rightRearMotor = Hardware.Controllers.talonController(RIGHT_REAR_MOTOR_CAN_ID, DRIVE_PULSES_PER_DEGREE, 0.0);
-        AHRS navX = new AHRS(SPI.Port.kMXP);
-        Compass compass = Compass.create(navX::getFusedHeading);
-
-        leftFrontMotor.setFeedbackDevice(TalonSRX.FeedbackDevice.MAGNETIC_ENCODER_RELATIVE)
-                .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
-                .setControlMode(TalonController.ControlMode.SPEED);
-        leftRearMotor.setFeedbackDevice(TalonSRX.FeedbackDevice.MAGNETIC_ENCODER_RELATIVE)
-                .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
-                .setControlMode(TalonController.ControlMode.SPEED);
-        rightFrontMotor.setFeedbackDevice(TalonSRX.FeedbackDevice.MAGNETIC_ENCODER_RELATIVE)
-                .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
-                .setControlMode(TalonController.ControlMode.SPEED);
-        rightRearMotor.setFeedbackDevice(TalonSRX.FeedbackDevice.MAGNETIC_ENCODER_RELATIVE)
-                .withGains(DRIVE_P_GAIN, DRIVE_I_GAIN, DRIVE_D_GAIN)
-                .setControlMode(TalonController.ControlMode.SPEED);
+        Motor leftFrontMotor = Hardware.Controllers.talonController(LEFT_FRONT_MOTOR_CAN_ID, 0.0, 0.0);
+        Motor leftRearMotor = Hardware.Controllers.talonController(LEFT_REAR_MOTOR_CAN_ID, 0.0, 0.0);
+        Motor rightFrontMotor = Hardware.Controllers.talonController(RIGHT_FRONT_MOTOR_CAN_ID, 0.0, 0.0)
+                .invert();
+        Motor rightRearMotor = Hardware.Controllers.talonController(RIGHT_REAR_MOTOR_CAN_ID, 0.0, 0.0)
+                .invert();
+        Compass compass = Compass.create(() -> 0);
 
         MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
         drivetrain = new Drivetrain(drive, compass);
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
-        driveX = flightStick.getRoll();
-        driveY = flightStick.getPitch();
-        driveRotation = flightStick.getYaw();
-        relativeEnable = flightStick.getThumb();
-        trimPot = flightStick.getDPad(0);
+        DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
+        driveX = flightStick.getRoll().scale(throttle);
+        driveY = flightStick.getPitch().scale(throttle);
+        driveRotation = flightStick.getYaw().scale(throttle);
     }
 
     @Override
@@ -83,13 +55,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (trimPot.getDirection() != -1) {
-            drivetrain.trimDrive(trimPot.getDirection());
-        } else if (relativeEnable.isTriggered()) {
-            drivetrain.relativeDrive(driveX.read(), driveY.read(), driveRotation.read());
-        } else {
-            drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
-        }
+        drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
+        SmartDashboard.putNumber("Heading", drivetrain.getHeading());
     }
 
     @Override
