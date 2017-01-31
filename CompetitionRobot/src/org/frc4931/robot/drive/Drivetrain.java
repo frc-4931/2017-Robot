@@ -20,8 +20,7 @@ public class Drivetrain implements Requirable {
     }
 
     public void relativeDrive(double x, double y, double rotation) {
-        y *= -1; // Joystick axis needs to be inverted
-        drive.polar(Math.sqrt(x * x + y * y), Math.atan2(-y, x), rotation);
+        drive.polar(Math.sqrt(x * x + y * y), Math.toDegrees(Math.atan2(x, y)), rotation);
     }
 
     public void trimDrive(int angle) {
