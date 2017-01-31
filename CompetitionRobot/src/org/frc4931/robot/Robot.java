@@ -43,10 +43,10 @@ public class Robot extends IterativeRobot {
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
-        DoubleToDoubleFunction squarer = (x) -> x * x;
-        driveX = flightStick.getRoll().map(squarer).scale(throttle);
-        driveY = flightStick.getPitch().map(squarer).scale(throttle);
-        driveRotation = flightStick.getYaw().map(squarer).scale(throttle);
+        DoubleToDoubleFunction squarer = (x) -> x * Math.abs(x);
+        driveX = flightStick.getRoll().scale(throttle).map(squarer);
+        driveY = flightStick.getPitch().scale(throttle).map(squarer);
+        driveRotation = flightStick.getYaw().scale(throttle).map(squarer);
     }
 
     @Override
