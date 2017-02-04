@@ -1,9 +1,12 @@
 /* Created Sat Jan 07 19:18:14 CST 2017 */
 package org.frc4931.robot;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.DoubleSupplier;
+import org.frc4931.robot.components.NavXCompass;
 import org.frc4931.robot.drive.Drivetrain;
 import org.strongback.Strongback;
 import org.strongback.components.Compass;
@@ -27,6 +30,7 @@ public class Robot extends IterativeRobot {
     private ContinuousRange driveX;
     private ContinuousRange driveY;
     private ContinuousRange driveRotation;
+    private boolean relative;
 
     @Override
     public void robotInit() {
@@ -36,17 +40,28 @@ public class Robot extends IterativeRobot {
                 .invert();
         Motor rightRearMotor = Hardware.Controllers.talonController(RIGHT_REAR_MOTOR_CAN_ID, 0.0, 0.0)
                 .invert();
-        Compass compass = Compass.create(() -> 0);
+        AHRS navX = new AHRS(SPI.Port.kMXP);
+        Compass compass = new NavXCompass(navX);
 
         MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
         drivetrain = new Drivetrain(drive, compass);
+        drivetrain.zeroHeading();
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
         DoubleToDoubleFunction squarer = (x) -> x * Math.abs(x);
-        driveX = flightStick.getRoll().scale(throttle).map(squarer);
-        driveY = flightStick.getPitch().scale(throttle).map(squarer);
-        driveRotation = flightStick.getYaw().scale(throttle).map(squarer);
+        driveX = flightStick.getRoll()
+                .scale(throttle)
+                .map(squarer);
+        driveY = flightStick.getPitch()
+                .scale(throttle)
+                .map(squarer);
+        driveRotation = flightStick.getYaw()
+                .scale(throttle)
+                .map(squarer);
+        relative = false;
+        Strongback.switchReactor().onTriggered(flightStick.getThumb(), () -> relative = !relative);
+        Strongback.switchReactor().onTriggered(flightStick.getButton(7), drivetrain::zeroHeading);
     }
 
     @Override
@@ -57,7 +72,11 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
+        if (relative) {
+            drivetrain.relativeDrive(driveX.read(), driveY.read(), driveRotation.read());
+        } else {
+            drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
+        }
         SmartDashboard.putNumber("Heading", drivetrain.getHeading());
     }
 

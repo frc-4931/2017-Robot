@@ -20,6 +20,7 @@ public class Drivetrain implements Requirable {
     }
 
     public void relativeDrive(double x, double y, double rotation) {
+        y *= -1;
         drive.polar(Math.sqrt(x * x + y * y), Math.toDegrees(Math.atan2(x, y)), rotation);
     }
 
@@ -30,4 +31,6 @@ public class Drivetrain implements Requirable {
     public double getHeading() {
         return heading.getHeading();
     }
+
+    public void zeroHeading() { heading.zero(); }
 }
