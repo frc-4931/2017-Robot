@@ -1,19 +1,26 @@
 package org.frc4931.robot.Conveyor;
 
-import org.frc4931.robot.Conveyor.*;
-import org.strongback.SwitchReactor;
 import org.strongback.command.Command;
 import org.strongback.components.Switch;
 
 /**
  * Created by jcrane on 1/28/17.
  */
+
 public class ConveyorCollect extends Command {
     private final Conveyor conveyor;
+    private final Switch shouldContinue;
 
-    public ConveyorCollect(Conveyor conveyor) {
+    /**
+     * Turns the intake on and the shooter to shooterIdleSpeed.
+     *
+     * @param conveyor       The conveyor to set to collect.
+     * @param shouldContinue A Switch that when released will stop the command.
+     */
+    public ConveyorCollect(Conveyor conveyor, Switch shouldContinue) {
         super(conveyor);
         this.conveyor = conveyor;
+        this.shouldContinue = shouldContinue;
     }
 
     @Override
@@ -23,12 +30,11 @@ public class ConveyorCollect extends Command {
 
     @Override
     public boolean execute() {
-        return true;
-        //return !shouldContinue.isTriggered();
+        return !shouldContinue.isTriggered();
     }
 
     @Override
     public void end() {
-
+        super.end();
     }
 }

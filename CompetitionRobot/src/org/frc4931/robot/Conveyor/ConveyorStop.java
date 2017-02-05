@@ -9,6 +9,11 @@ import org.strongback.components.Switch;
 public class ConveyorStop extends Command {
     private final Conveyor conveyor;
 
+    /**
+     * Stops the entire Conveyor sub system.
+     *
+     * @param conveyor The conveyor to stop.
+     */
     public ConveyorStop(Conveyor conveyor) {
         super(conveyor);
         this.conveyor = conveyor;
