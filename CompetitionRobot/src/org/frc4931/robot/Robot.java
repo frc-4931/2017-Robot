@@ -1,6 +1,16 @@
 /* Created Sat Jan 07 19:18:14 CST 2017 */
 package org.frc4931.robot;
 
+import org.strongback.SwitchReactor;
+
+import org.frc4931.robot.Conveyor.ConveyorShootWhile;
+import org.frc4931.robot.Conveyor.Conveyor;
+import org.frc4931.robot.Conveyor.ConveyorCollect;
+import org.frc4931.robot.Conveyor.ConveyorStop;
+
+import org.strongback.components.Switch;
+import org.strongback.control.TalonController;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
@@ -34,6 +44,16 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
+        TalonController ballShooter = Hardware.Controllers.talonController(1, 2.5, 0)
+                .setControlMode(TalonController.ControlMode.SPEED).withGains(0, 0, 0);
+        Motor conveyorIntake = Hardware.Motors.talonSRX(2);
+
+        FlightStick gamepad1 = Hardware.HumanInterfaceDevices.logitechAttack3D(1);
+        Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);
+        Switch intake = gamepad1.getButton(3);
+        Switch shoot = gamepad1.getButton(5);
+        Switch stop = gamepad1.getButton(4);
+
         Motor leftFrontMotor = Hardware.Controllers.talonController(LEFT_FRONT_MOTOR_CAN_ID, 0.0, 0.0);
         Motor leftRearMotor = Hardware.Controllers.talonController(LEFT_REAR_MOTOR_CAN_ID, 0.0, 0.0);
         Motor rightFrontMotor = Hardware.Controllers.talonController(RIGHT_FRONT_MOTOR_CAN_ID, 0.0, 0.0)
@@ -62,6 +82,9 @@ public class Robot extends IterativeRobot {
         relative = false;
         Strongback.switchReactor().onTriggered(flightStick.getThumb(), () -> relative = !relative);
         Strongback.switchReactor().onTriggered(flightStick.getButton(7), drivetrain::zeroHeading);
+        Strongback.switchReactor().onTriggered(intake, () -> new ConveyorCollect(conveyor, intake));
+        Strongback.switchReactor().onTriggered(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 1600));
+        Strongback.switchReactor().onTriggered(stop, () -> new ConveyorStop(conveyor));
     }
 
     @Override
@@ -85,5 +108,4 @@ public class Robot extends IterativeRobot {
         // Tell Strongback that the robot is disabled so it can flush and kill commands.
         Strongback.disable();
     }
-
 }
