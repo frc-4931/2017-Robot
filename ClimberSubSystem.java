@@ -3,43 +3,60 @@ package org.frc4931.robot;
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
 
-public class ClimberSubSystem 
-{
-	private final Motor climbPaddle;
-	private final Switch horizontal, vertical, touchPad;
+/**
+ * Created by christianmeinz1516 on 2/14/17
+ */
+public class ClimberSubSystem{
+    private final Motor climbPaddle;
+    private final Switch horizontal, vertical, touchPad;
 	
-	public ClimberSubSystem(Motor climbPaddle1, Motor climbPaddle2, 
-							Switch horizontal, Switch vertical, Switch touchPad)
-	{
-		climbPaddle = Motor.compose(climbPaddle1, climbPaddle2);
+    /*
+     * @param climbPaddle The combined motor for the climber
+     * @param horizontal  Trip sensor for detecting horizontal
+     * @param vertical    Trip sensor for detecting vertical
+     * @param touchPad    Trip sensor for detecting touch pad
+     */
+    public ClimberSubSystem(Motor climbPaddle, Switch horizontal, Switch vertical, Switch touchPad){
+        this.climbPaddle = climbPaddle;
 		
-		this.vertical = vertical;
-		this.horizontal = horizontal;
-		this.touchPad = touchPad;
-	}
+        this.horizontal = horizontal;
+        this.vertical = vertical;
+        this.touchPad = touchPad;
+    }
 	
-	public void start()
-	{
-		climbPaddle.setSpeed(1.0);
-	}
+    /*
+     * Starts the climber motor at a speed of 1
+     */
+    public void start(){
+        climbPaddle.setSpeed(1.0);
+    }
 	
-	public void stop()
-	{
-		climbPaddle.stop();
-	}
+    /*
+     * Stops the climber motor
+     */
+    public void stop(){
+        climbPaddle.stop();
+    }
 	
-	public boolean hasScored()
-	{
-		return touchPad.isTriggered();
-	}
+    /*
+     * Returns if the touch pad has been triggered
+     */
+    public boolean hasScored(){
+        return touchPad.isTriggered();
+    }
 	
-	public boolean isHorizontal()
-	{
-		return horizontal.isTriggered();
-	}
+    /*
+     * Returns if the horizontal switch has been triggered
+     */
+    public boolean isHorizontal(){
+        return horizontal.isTriggered();
+    }
 	
-	public boolean isVertical()
-	{
-		return vertical.isTriggered();
-	}
+    /*
+     * Returns if the vertical switch has been triggered
+     */
+    public boolean isVertical(){
+        return vertical.isTriggered();
+    }
+    
 }
