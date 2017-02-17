@@ -22,7 +22,7 @@ public class Drivetrain implements Requirable {
      * @param rotation The joystick's twist (yaw) axis, a value in [-1.0..1.0]. Translates to rotation of the robot.
      */
     public void absoluteDrive(double x, double y, double rotation) {
-        drive.cartesian(x, y, rotation);
+        drive.absoluteCartesian(x, y, rotation);
     }
 
     /**
@@ -32,8 +32,7 @@ public class Drivetrain implements Requirable {
      * @param rotation The joystick's twist (yaw) axis, a value in [-1.0..1.0]. Translates to rotation of the robot.
      */
     public void relativeDrive(double x, double y, double rotation) {
-        y *= -1;
-        drive.polar(Math.sqrt(x * x + y * y), Math.toDegrees(Math.atan2(x, y)), rotation);
+        drive.relativeCartesian(x, y, rotation);
     }
 
     /**
@@ -41,7 +40,7 @@ public class Drivetrain implements Requirable {
      * @param angle The angle (in degrees) at which the robot should drive.
      */
     public void trimDrive(int angle) {
-        drive.polar(DRIVE_TRIM_SPEED, angle, 0.0);
+        drive.relativePolar(DRIVE_TRIM_SPEED, angle, 0.0);
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.frc4931.robot;
+package org.frc4931.robot.climber;
 
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
