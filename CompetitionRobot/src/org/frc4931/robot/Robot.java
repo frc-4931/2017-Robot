@@ -66,7 +66,7 @@ public class Robot extends IterativeRobot {
 
         TalonController ballShooter = Hardware.Controllers.talonController(CONVEYOR_SHOOTER_MOTOR_CAN_ID, 0, 0)
                 .setControlMode(TalonController.ControlMode.SPEED).withGains(0, 0, 0);
-        Motor conveyorIntake = Hardware.Motors.talonSRX(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
+        Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
 
         Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);
 
