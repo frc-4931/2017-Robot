@@ -40,7 +40,6 @@ public class ClimberSubSystem {
 	
     /**
      * Returns if the touch pad has been triggered
-     * 
      * @return Gets the boolean triggered reading from the touch pad sensor.
      */
     public boolean hasScored() {
@@ -49,7 +48,6 @@ public class ClimberSubSystem {
 	
     /**
      * Returns if the horizontal switch has been triggered
-     * 
      * @return Gets the boolean triggered reading from the horizontal sensor.
      */
     public boolean isHorizontal() {
@@ -58,7 +56,6 @@ public class ClimberSubSystem {
 	
     /**
      * Returns if the vertical switch has been triggered
-     * 
      * @return Gets the boolean triggered reading from the vertical sensor.
      */
     public boolean isVertical() {
