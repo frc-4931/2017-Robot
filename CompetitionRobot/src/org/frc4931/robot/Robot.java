@@ -70,8 +70,8 @@ public class Robot extends IterativeRobot {
 
         Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);
 
-        Motor leftClimberMotor = Hardware.Motors.spark(LEFT_CLIMBER_MOTOR_PWM_PORT);
-        Motor rightClimberMotor = Hardware.Motors.spark(RIGHT_CLIMBER_MOTOR_PWM_PORT)
+        Motor leftClimberMotor = Hardware.Motors.talon(LEFT_CLIMBER_MOTOR_PWM_PORT);
+        Motor rightClimberMotor = Hardware.Motors.talon(RIGHT_CLIMBER_MOTOR_PWM_PORT)
                 .invert();
         Motor climberMotor = Motor.compose(leftClimberMotor, rightClimberMotor);
         Switch paddleHorizontal = Hardware.Switches.normallyClosed(CLIMBER_HORIZONTAL_SWITCH_DIO_PORT);
