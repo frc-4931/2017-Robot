@@ -35,6 +35,6 @@ public class ConveyorCollect extends Command {
 
     @Override
     public void end() {
-        super.end();
+        conveyor.stop();
     }
 }

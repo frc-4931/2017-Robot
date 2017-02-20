@@ -1,7 +1,6 @@
 package org.frc4931.robot.Conveyor;
 
 import org.strongback.command.Command;
-import org.strongback.command.Requirable;
 import org.strongback.components.Switch;
 
 /**
@@ -38,6 +37,6 @@ public class ConveyorShootWhile extends Command {
 
     @Override
     public void end() {
-        conveyor.collect();
+        conveyor.stop();
     }
 }
