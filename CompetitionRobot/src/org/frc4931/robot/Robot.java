@@ -1,6 +1,7 @@
 /* Created Sat Jan 07 19:18:14 CST 2017 */
 package org.frc4931.robot;
 
+import com.ctre.CANTalon;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
@@ -17,6 +18,7 @@ import org.strongback.Strongback;
 import org.strongback.components.Compass;
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
+import org.strongback.components.TalonSRX;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.control.TalonController;
@@ -65,8 +67,14 @@ public class Robot extends IterativeRobot {
         drivetrain = new Drivetrain(drive, compass);
         drivetrain.zeroHeading();
 
-        TalonController ballShooter = Hardware.Controllers.talonController(CONVEYOR_SHOOTER_MOTOR_CAN_ID, 0, 0)
-                .setControlMode(TalonController.ControlMode.SPEED).withGains(0, 0, 0);
+        CANTalon shooterMotor = new CANTalon(CONVEYOR_SHOOTER_MOTOR_CAN_ID);
+        shooterMotor.configEncoderCodesPerRev(1024);
+        shooterMotor.reverseOutput(true);
+        shooterMotor.reverseSensor(true);
+        TalonController ballShooter = Hardware.Controllers.talonController(shooterMotor, 1.0, 0.0)
+                .setFeedbackDevice(TalonSRX.FeedbackDevice.QUADRATURE_ENCODER)
+                .setControlMode(TalonController.ControlMode.SPEED)
+                .withGains(0.0246, 0.0, 0.0);
         Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
 
         Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);

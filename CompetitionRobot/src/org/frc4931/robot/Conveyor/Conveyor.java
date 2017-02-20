@@ -5,12 +5,12 @@ package org.frc4931.robot.Conveyor;
  */
 
 import org.strongback.command.Requirable;
-import org.strongback.control.Controller;
 import org.strongback.components.Motor;
+import org.strongback.control.Controller;
 
 public class Conveyor implements Requirable {
     private double intakeSpeed = 0.5;
-    private double shooterIdleSpeed = 150;
+    private double shooterIdleSpeed = 200;
     private final Controller shooter;
     private final Motor intake;
 
