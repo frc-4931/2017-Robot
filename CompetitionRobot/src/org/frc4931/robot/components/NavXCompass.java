@@ -12,7 +12,7 @@ public class NavXCompass implements Compass {
 
     @Override
     public double getAngle() {
-        return navX.getFusedHeading();
+        return -1.0 * navX.getFusedHeading(); //TODO Figure out why compass is backward on practice robot
     }
 
     @Override
