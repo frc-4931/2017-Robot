@@ -74,7 +74,7 @@ public class Robot extends IterativeRobot {
         TalonController ballShooter = Hardware.Controllers.talonController(shooterMotor, 1.0, 0.0)
                 .setFeedbackDevice(TalonSRX.FeedbackDevice.QUADRATURE_ENCODER)
                 .setControlMode(TalonController.ControlMode.SPEED)
-                .withGains(0.0246, 0.0, 0.0);
+                .withGains(0.009038, 0.0, 0.0);
         Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
 
         Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);
@@ -114,7 +114,7 @@ public class Robot extends IterativeRobot {
         Strongback.switchReactor().onTriggered(relativeToggle, () -> relative = !relative);
         Strongback.switchReactor().onTriggered(zeroHeading, drivetrain::zeroHeading);
         Strongback.switchReactor().onTriggeredSubmit(intake, () -> new ConveyorCollect(conveyor, intake));
-        Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 1600));
+        Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 6000));
         Strongback.switchReactor().onTriggeredSubmit(climbUp, () -> new ClimbUpWhile(climber, climbUp));
         Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbUp));
     }
