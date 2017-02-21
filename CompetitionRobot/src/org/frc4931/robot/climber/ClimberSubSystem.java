@@ -1,12 +1,13 @@
 package org.frc4931.robot.climber;
 
+import org.strongback.command.Requirable;
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
 
 /**
  * Created by christianmeinz1516 on 2/14/17
  */
-public class ClimberSubSystem{
+public class ClimberSubSystem implements Requirable {
     private final Motor climbPaddle;
     private final Switch horizontal, vertical, touchPad;
 	
@@ -27,8 +28,15 @@ public class ClimberSubSystem{
     /*
      * Starts the climber motor at a speed of 1
      */
-    public void start(){
+    public void climbUp(){
         climbPaddle.setSpeed(1.0);
+    }
+
+    /**
+     * Starts the climber motor at a speed of -1.
+     */
+    public void climbDown() {
+        climbPaddle.setSpeed(-1.0);
     }
 	
     /*
@@ -58,5 +66,4 @@ public class ClimberSubSystem{
     public boolean isVertical(){
         return vertical.isTriggered();
     }
-    
 }
