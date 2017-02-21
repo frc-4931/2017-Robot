@@ -12,15 +12,17 @@ import org.frc4931.robot.Conveyor.ConveyorShootWhile;
 import org.frc4931.robot.climber.ClimbDownWhile;
 import org.frc4931.robot.climber.ClimbUpWhile;
 import org.frc4931.robot.climber.ClimberSubSystem;
+import org.frc4931.robot.components.HardwarePixy;
 import org.frc4931.robot.components.NavXCompass;
 import org.frc4931.robot.drive.Drivetrain;
+import org.frc4931.robot.vision.VisionSystem;
+import org.strongback.Executor;
 import org.strongback.Strongback;
 import org.strongback.components.Compass;
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
 import org.strongback.components.TalonSRX;
 import org.strongback.components.ui.ContinuousRange;
-import org.strongback.components.ui.DirectionalAxis;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.control.TalonController;
 import org.strongback.drive.MecanumDrive;
@@ -64,7 +66,6 @@ public class Robot extends IterativeRobot {
                 .invert();
         AHRS navX = new AHRS(SPI.Port.kMXP);
         Compass compass = new NavXCompass(navX);
-
         MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
         drivetrain = new Drivetrain(drive, compass);
         drivetrain.zeroHeading();
@@ -78,7 +79,6 @@ public class Robot extends IterativeRobot {
                 .setControlMode(TalonController.ControlMode.SPEED)
                 .withGains(0.009038, 0.0, 0.0);
         Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
-
         conveyor = new Conveyor(ballShooter, conveyorIntake, shooterMotor::getSpeed);
 
         Motor leftClimberMotor = Hardware.Motors.talon(LEFT_CLIMBER_MOTOR_PWM_PORT)
@@ -88,8 +88,11 @@ public class Robot extends IterativeRobot {
         Switch paddleHorizontal = () -> false; //Hardware.Switches.normallyClosed(CLIMBER_HORIZONTAL_SWITCH_DIO_PORT);
         Switch paddleVertical = () -> false; //Hardware.Switches.normallyClosed(CLIMBER_VERTICAL_SWITCH_DIO_PORT);
         Switch climbScore = () -> false; //Hardware.Switches.normallyOpen(CLIMBER_SCORE_SWITCH_DIO_PORT);
-
         climber = new ClimberSubSystem(climberMotor, paddleHorizontal, paddleVertical, climbScore);
+
+        HardwarePixy pixy = new HardwarePixy(SPI.Port.kOnboardCS0);
+        Strongback.executor().register((millis) -> pixy.sync(), Executor.Priority.MEDIUM);
+        VisionSystem system = new VisionSystem(pixy);
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
