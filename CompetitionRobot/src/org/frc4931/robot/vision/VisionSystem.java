@@ -9,6 +9,7 @@ import java.util.List;
 
 public class VisionSystem implements Requirable {
     public static final int TARGET_SIGNATURE = 1;
+    public static final double FORWARD_DISTANCE_METER_PIXELS = 50.0;
 
     private final Pixy pixy;
     private final double lateralTarget;
@@ -28,7 +29,7 @@ public class VisionSystem implements Requirable {
         targets.removeIf((block) -> block.getSignature() != TARGET_SIGNATURE);
 
         if (targets.size() == 2) {
-            forwardDistanceToLift = 1 / Math.abs(targets.get(0).getCenterX() - targets.get(1).getCenterX()); //TODO
+            forwardDistanceToLift = FORWARD_DISTANCE_METER_PIXELS / Math.abs(targets.get(0).getCenterX() - targets.get(1).getCenterX());
             lateralDistanceToLift = (targets.get(0).getCenterX() + targets.get(1).getCenterX()) / 2.0 - lateralTarget;
         }
     }

@@ -55,6 +55,7 @@ public class Robot extends IterativeRobot {
     private ContinuousRange driveX;
     private ContinuousRange driveY;
     private ContinuousRange driveRotation;
+    private VisionSystem visionSystem;
 
     @Override
     public void robotInit() {
@@ -91,8 +92,9 @@ public class Robot extends IterativeRobot {
         climber = new ClimberSubSystem(climberMotor, paddleHorizontal, paddleVertical, climbScore);
 
         HardwarePixy pixy = new HardwarePixy(SPI.Port.kOnboardCS0);
+        visionSystem = new VisionSystem(pixy, 0.0);
         Strongback.executor().register((millis) -> pixy.sync(), Executor.Priority.MEDIUM);
-        VisionSystem system = new VisionSystem(pixy);
+        Strongback.executor().register((millis) -> visionSystem.update(), Executor.Priority.MEDIUM);
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
@@ -128,6 +130,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putBoolean("Relative Enabled", drivetrain.isRelativeEnabled());
         SmartDashboard.putNumber("Heading", drivetrain.getHeading());
         SmartDashboard.putNumber("Shooter Speed", conveyor.getShooterSpeed());
+        SmartDashboard.putNumber("Forward Distance", visionSystem.getForwardDistanceToLift());
+        SmartDashboard.putNumber("Lateral Distance", visionSystem.getLateralDistanceToLift());
     }
 
     @Override
