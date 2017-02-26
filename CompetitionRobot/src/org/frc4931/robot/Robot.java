@@ -116,7 +116,7 @@ public class Robot extends IterativeRobot {
         Strongback.switchReactor().onTriggeredSubmit(intake, () -> new ConveyorCollect(conveyor, intake));
         Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 6000));
         Strongback.switchReactor().onTriggeredSubmit(climbUp, () -> new ClimbUpWhile(climber, climbUp));
-        Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbUp));
+        Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbDown));
     }
 
     @Override
