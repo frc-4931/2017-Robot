@@ -120,6 +120,12 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
+    public void robotPeriodic() {
+        SmartDashboard.putBoolean("Relative Enabled", relative);
+        SmartDashboard.putNumber("Heading", drivetrain.getHeading());
+    }
+
+    @Override
     public void teleopInit() {
         // Start Strongback functions ...
         Strongback.start();
@@ -132,9 +138,6 @@ public class Robot extends IterativeRobot {
         } else {
             drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
         }
-
-        SmartDashboard.putBoolean("Relative Enabled", relative);
-        SmartDashboard.putNumber("Heading", drivetrain.getHeading());
     }
 
     @Override
