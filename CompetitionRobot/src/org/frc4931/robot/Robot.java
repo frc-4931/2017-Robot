@@ -20,6 +20,7 @@ import org.strongback.components.Motor;
 import org.strongback.components.Switch;
 import org.strongback.components.TalonSRX;
 import org.strongback.components.ui.ContinuousRange;
+import org.strongback.components.ui.DirectionalAxis;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.control.TalonController;
 import org.strongback.drive.MecanumDrive;
@@ -46,11 +47,12 @@ public class Robot extends IterativeRobot {
     private static final int FLIGHT_STICK_PORT = 0;
 
     private Drivetrain drivetrain;
+    private Conveyor conveyor;
+    private ClimberSubSystem climber;
 
     private ContinuousRange driveX;
     private ContinuousRange driveY;
     private ContinuousRange driveRotation;
-    private boolean relative;
 
     @Override
     public void robotInit() {
@@ -77,7 +79,7 @@ public class Robot extends IterativeRobot {
                 .withGains(0.009038, 0.0, 0.0);
         Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
 
-        Conveyor conveyor = new Conveyor(ballShooter, conveyorIntake);
+        conveyor = new Conveyor(ballShooter, conveyorIntake, shooterMotor::getSpeed);
 
         Motor leftClimberMotor = Hardware.Motors.talon(LEFT_CLIMBER_MOTOR_PWM_PORT)
                 .invert();
@@ -87,7 +89,7 @@ public class Robot extends IterativeRobot {
         Switch paddleVertical = () -> false; //Hardware.Switches.normallyClosed(CLIMBER_VERTICAL_SWITCH_DIO_PORT);
         Switch climbScore = () -> false; //Hardware.Switches.normallyOpen(CLIMBER_SCORE_SWITCH_DIO_PORT);
 
-        ClimberSubSystem climber = new ClimberSubSystem(climberMotor, paddleHorizontal, paddleVertical, climbScore);
+        climber = new ClimberSubSystem(climberMotor, paddleHorizontal, paddleVertical, climbScore);
 
         FlightStick flightStick = Hardware.HumanInterfaceDevices.logitechExtreme3D(FLIGHT_STICK_PORT);
         DoubleSupplier throttle = () -> flightStick.getThrottle().read() / -2 + 0.5;
@@ -103,7 +105,6 @@ public class Robot extends IterativeRobot {
                 .invert()
                 .scale(throttle)
                 .map(squarer);
-        relative = false;
         Switch relativeToggle = flightStick.getThumb();
         Switch zeroHeading = flightStick.getButton(7);
         Switch intake = flightStick.getButton(3);
@@ -111,12 +112,19 @@ public class Robot extends IterativeRobot {
         Switch climbUp = flightStick.getButton(6);
         Switch climbDown = flightStick.getButton(4);
 
-        Strongback.switchReactor().onTriggered(relativeToggle, () -> relative = !relative);
+        Strongback.switchReactor().onTriggered(relativeToggle, drivetrain::toggleRelativeEnabled);
         Strongback.switchReactor().onTriggered(zeroHeading, drivetrain::zeroHeading);
         Strongback.switchReactor().onTriggeredSubmit(intake, () -> new ConveyorCollect(conveyor, intake));
         Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 6000));
         Strongback.switchReactor().onTriggeredSubmit(climbUp, () -> new ClimbUpWhile(climber, climbUp));
-        Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbUp));
+        Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbDown));
+    }
+
+    @Override
+    public void robotPeriodic() {
+        SmartDashboard.putBoolean("Relative Enabled", drivetrain.isRelativeEnabled());
+        SmartDashboard.putNumber("Heading", drivetrain.getHeading());
+        SmartDashboard.putNumber("Shooter Speed", conveyor.getShooterSpeed());
     }
 
     @Override
@@ -127,14 +135,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (relative) {
-            drivetrain.relativeDrive(driveX.read(), driveY.read(), driveRotation.read());
-        } else {
-            drivetrain.absoluteDrive(driveX.read(), driveY.read(), driveRotation.read());
-        }
-
-        SmartDashboard.putBoolean("Relative Enabled", relative);
-        SmartDashboard.putNumber("Heading", drivetrain.getHeading());
+        drivetrain.drive(driveX.read(), driveY.read(), driveRotation.read());
     }
 
     @Override

@@ -10,9 +10,20 @@ public class Drivetrain implements Requirable {
     private final MecanumDrive drive;
     private final Compass heading;
 
+    private boolean relativeEnabled;
+
     public Drivetrain(MecanumDrive drive, Compass heading) {
         this.drive = drive;
         this.heading = heading;
+        relativeEnabled = false;
+    }
+
+    public void drive(double x, double y, double rotation) {
+        if (relativeEnabled) {
+            relativeDrive(x, y, rotation);
+        } else {
+            absoluteDrive(x, y, rotation);
+        }
     }
 
     /**
@@ -53,8 +64,20 @@ public class Drivetrain implements Requirable {
     }
 
     /**
-     * Sets the robot's current heading to zero. All future {@link #getHeading()} calls will be relative to the new
+     * Sets the robot's current heading to zero. All future {@link #getHeading()} calls will be relativeEnabled to the new
      * calibration.
      */
     public void zeroHeading() { heading.zero(); }
+
+    public boolean isRelativeEnabled() {
+        return relativeEnabled;
+    }
+
+    public void setRelativeEnabled(boolean relativeEnabled) {
+        this.relativeEnabled = relativeEnabled;
+    }
+
+    public void toggleRelativeEnabled() {
+        relativeEnabled = !relativeEnabled;
+    }
 }

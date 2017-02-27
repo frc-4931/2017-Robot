@@ -6,6 +6,7 @@ package org.frc4931.robot.Conveyor;
 
 import org.strongback.command.Requirable;
 import org.strongback.components.Motor;
+import org.strongback.components.SpeedSensor;
 import org.strongback.control.Controller;
 
 public class Conveyor implements Requirable {
@@ -13,16 +14,18 @@ public class Conveyor implements Requirable {
     private double shooterIdleSpeed = 200;
     private final Controller shooter;
     private final Motor intake;
+    private final SpeedSensor shooterSpeed;
 
     /**
      * Constructs a new Conveyor subsystem given a motor controller and a motor.
-     *
-     * @param shooter The Controller that is responsible for controlling the shooting mechanism.
+     *  @param shooter The Controller that is responsible for controlling the shooting mechanism.
      * @param intake  The Motor that is responsible for driving the conveyor intake.
+     * @param shooterSpeed
      */
-    public Conveyor(Controller shooter, Motor intake) {
+    public Conveyor(Controller shooter, Motor intake, SpeedSensor shooterSpeed) {
         this.shooter = shooter;
         this.intake = intake;
+        this.shooterSpeed = shooterSpeed;
     }
 
     /**
@@ -69,4 +72,7 @@ public class Conveyor implements Requirable {
         this.shooterIdleSpeed = shooterIdleSpeed;
     }
 
+    public double getShooterSpeed() {
+        return shooterSpeed.getSpeed();
+    }
 }
