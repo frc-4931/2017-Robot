@@ -10,8 +10,8 @@ import org.strongback.components.SpeedSensor;
 import org.strongback.control.Controller;
 
 public class Conveyor implements Requirable {
-    private double intakeSpeed = 0.5;
-    private double shooterIdleSpeed = 200;
+    private double intakeSpeed = 1.0;
+    private double shooterIdleSpeed = 1000;
     private final Controller shooter;
     private final Motor intake;
     private final SpeedSensor shooterSpeed;
