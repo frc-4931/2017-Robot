@@ -54,6 +54,10 @@ public class Drivetrain implements Requirable {
         drive.relativePolar(DRIVE_TRIM_SPEED, angle, 0.0);
     }
 
+    public void stop() {
+        drive.stop();
+    }
+
     /**
      * Gets the reading from the heading sensor.
      * @return An angle in degrees describing the robot's heading. 0 is calibrated toward the far end of the field, and

@@ -5,10 +5,12 @@ import com.ctre.CANTalon;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frc4931.robot.Conveyor.Conveyor;
 import org.frc4931.robot.Conveyor.ConveyorCollect;
 import org.frc4931.robot.Conveyor.ConveyorShootWhile;
+import org.frc4931.robot.auto.*;
 import org.frc4931.robot.climber.ClimbDownWhile;
 import org.frc4931.robot.climber.ClimbUpWhile;
 import org.frc4931.robot.climber.ClimberSubSystem;
@@ -18,6 +20,7 @@ import org.frc4931.robot.drive.Drivetrain;
 import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.Executor;
 import org.strongback.Strongback;
+import org.strongback.command.Command;
 import org.strongback.components.Compass;
 import org.strongback.components.Motor;
 import org.strongback.components.Switch;
@@ -30,6 +33,7 @@ import org.strongback.function.DoubleToDoubleFunction;
 import org.strongback.hardware.Hardware;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class Robot extends IterativeRobot {
     private static final int LEFT_FRONT_MOTOR_CAN_ID = 1;
@@ -51,11 +55,12 @@ public class Robot extends IterativeRobot {
     private Drivetrain drivetrain;
     private Conveyor conveyor;
     private ClimberSubSystem climber;
+    private VisionSystem visionSystem;
 
     private ContinuousRange driveX;
     private ContinuousRange driveY;
     private ContinuousRange driveRotation;
-    private VisionSystem visionSystem;
+    private SendableChooser<Supplier<Command>> autoChooser;
 
     @Override
     public void robotInit() {
@@ -123,6 +128,14 @@ public class Robot extends IterativeRobot {
         Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 4800));
         Strongback.switchReactor().onTriggeredSubmit(climbUp, () -> new ClimbUpWhile(climber, climbUp));
         Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbDown));
+
+        autoChooser = new SendableChooser<>();
+        autoChooser.addDefault("Do nothing", AutoNoOp::new);
+        autoChooser.addObject("Left gear", () -> new AutoGearLeft(drivetrain, visionSystem));
+        autoChooser.addObject("Center gear", () -> new AutoGearCenter(drivetrain, visionSystem));
+        autoChooser.addObject("Right gear", () -> new AutoGearRight(drivetrain, visionSystem));
+        autoChooser.addObject("Shoot", () -> new AutoShoot(drivetrain, visionSystem, conveyor));
+        SmartDashboard.putData("Auto Mode", autoChooser);
     }
 
     @Override
@@ -143,6 +156,18 @@ public class Robot extends IterativeRobot {
     @Override
     public void teleopPeriodic() {
         drivetrain.drive(driveX.read(), driveY.read(), driveRotation.read());
+    }
+
+    @Override
+    public void autonomousInit() {
+        drivetrain.zeroHeading(); // Robot should always start with its back against the alliance wall
+
+        Strongback.submit(autoChooser.getSelected().get());
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+        
     }
 
     @Override
