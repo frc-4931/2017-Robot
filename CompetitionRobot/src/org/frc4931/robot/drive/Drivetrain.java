@@ -2,6 +2,7 @@ package org.frc4931.robot.drive;
 
 import org.strongback.command.Requirable;
 import org.strongback.components.Compass;
+import org.strongback.components.DistanceSensor;
 import org.strongback.drive.MecanumDrive;
 
 public class Drivetrain implements Requirable {
@@ -9,12 +10,16 @@ public class Drivetrain implements Requirable {
 
     private final MecanumDrive drive;
     private final Compass heading;
+    private final DistanceSensor frontDistanceSensor;
+    private final DistanceSensor rearDistanceSensor;
 
     private boolean relativeEnabled;
 
-    public Drivetrain(MecanumDrive drive, Compass heading) {
+    public Drivetrain(MecanumDrive drive, Compass heading, DistanceSensor frontDistanceSensor, DistanceSensor rearDistanceSensor) {
         this.drive = drive;
         this.heading = heading;
+        this.frontDistanceSensor = frontDistanceSensor;
+        this.rearDistanceSensor = rearDistanceSensor;
         relativeEnabled = false;
     }
 
@@ -72,6 +77,22 @@ public class Drivetrain implements Requirable {
      * calibration.
      */
     public void zeroHeading() { heading.zero(); }
+
+    /**
+     * Gets the reading from the front distance sensor, typically how far away the robot is from the front wall.
+     * @return The measured distance in inches.
+     */
+    public double getFrontDistance() {
+        return frontDistanceSensor.getDistanceInInches();
+    }
+
+    /**
+     * Gets the reading from the rear distance sensor, typically how far away the robot is from the rear wall.
+     * @return The measured distance in inches.
+     */
+    public double getRearDistance() {
+        return rearDistanceSensor.getDistanceInInches();
+    }
 
     public boolean isRelativeEnabled() {
         return relativeEnabled;

@@ -21,10 +21,7 @@ import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.Executor;
 import org.strongback.Strongback;
 import org.strongback.command.Command;
-import org.strongback.components.Compass;
-import org.strongback.components.Motor;
-import org.strongback.components.Switch;
-import org.strongback.components.TalonSRX;
+import org.strongback.components.*;
 import org.strongback.components.ui.ContinuousRange;
 import org.strongback.components.ui.FlightStick;
 import org.strongback.control.TalonController;
@@ -50,6 +47,10 @@ public class Robot extends IterativeRobot {
     private static final int CLIMBER_VERTICAL_SWITCH_DIO_PORT = 1;
     private static final int CLIMBER_SCORE_SWITCH_DIO_PORT = 2;
 
+    private static final int FRONT_ULTRASONIC_A_ANALOG_PORT = 0;
+    private static final int FRONT_ULTRASONIC_B_ANALOG_PORT = 1;
+    private static final int REAR_ULTRASONIC_ANALOG_PORT = 2;
+
     private static final int FLIGHT_STICK_PORT = 0;
 
     private Drivetrain drivetrain;
@@ -72,8 +73,14 @@ public class Robot extends IterativeRobot {
                 .invert();
         AHRS navX = new AHRS(SPI.Port.kMXP);
         Compass compass = new NavXCompass(navX);
+        DistanceSensor frontDistanceSensorA = Hardware.DistanceSensors.analogUltrasonic(FRONT_ULTRASONIC_A_ANALOG_PORT, 102.4);
+        DistanceSensor frontDistanceSensorB = Hardware.DistanceSensors.analogUltrasonic(FRONT_ULTRASONIC_B_ANALOG_PORT, 102.4);
+        DistanceSensor rearDistanceSensor = Hardware.DistanceSensors.analogUltrasonic(REAR_ULTRASONIC_ANALOG_PORT, 102.4);
+        DistanceSensor frontDistanceSensor = DistanceSensor.create(
+                () -> Math.min(frontDistanceSensorA.getDistanceInInches(), frontDistanceSensorB.getDistanceInInches())
+        );
         MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
-        drivetrain = new Drivetrain(drive, compass);
+        drivetrain = new Drivetrain(drive, compass, frontDistanceSensor, rearDistanceSensor);
         drivetrain.zeroHeading();
 
         CANTalon shooterMotor = new CANTalon(CONVEYOR_SHOOTER_MOTOR_CAN_ID);
@@ -143,8 +150,10 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putBoolean("Relative Enabled", drivetrain.isRelativeEnabled());
         SmartDashboard.putNumber("Heading", drivetrain.getHeading());
         SmartDashboard.putNumber("Shooter Speed", conveyor.getShooterSpeed());
-        SmartDashboard.putNumber("Forward Distance", visionSystem.getForwardDistanceToLift());
-        SmartDashboard.putNumber("Lateral Distance", visionSystem.getLateralDistanceToLift());
+//        SmartDashboard.putNumber("Forward Distance", visionSystem.getForwardDistanceToLift());
+//        SmartDashboard.putNumber("Lateral Distance", visionSystem.getLateralDistanceToLift());
+        SmartDashboard.putNumber("Front distance", drivetrain.getFrontDistance());
+        SmartDashboard.putNumber("Rear distance", drivetrain.getRearDistance());
     }
 
     @Override
