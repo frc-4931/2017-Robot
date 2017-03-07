@@ -5,7 +5,7 @@ import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.command.Command;
 
 public class DriveToLift extends Command {
-    private final double STOP_DISTANCE = 6.0;
+    private final double STOP_DISTANCE = 55.0;
 
     private final Drivetrain drivetrain;
     private final VisionSystem visionSystem;
@@ -18,7 +18,7 @@ public class DriveToLift extends Command {
 
     @Override
     public void initialize() {
-        drivetrain.relativeDrive(0.0, 0.4, 0.0);
+        drivetrain.relativeDrive(0.0, 0.25, 0.0);
     }
 
     @Override

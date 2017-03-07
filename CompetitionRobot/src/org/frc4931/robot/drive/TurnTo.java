@@ -1,5 +1,6 @@
 package org.frc4931.robot.drive;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.strongback.Strongback;
 import org.strongback.command.Command;
 import org.strongback.control.Controller;
@@ -22,7 +23,11 @@ public class TurnTo extends Command {
                 .continuousInputs(true)
                 .withInputRange(0.0, 360.0)
                 .withTolerance(HEADING_TOLERANCE)
-                .withGains(0.0, 0.0, 0.0)
+                .withGains(
+                        SmartDashboard.getNumber("P", 0.0),
+                        SmartDashboard.getNumber("I", 0.0),
+                        SmartDashboard.getNumber("D", 0.0)
+                )
                 .withTarget(heading);
     }
 
@@ -34,11 +39,13 @@ public class TurnTo extends Command {
     @Override
     public boolean execute() {
         controller.executable().execute(Strongback.timeSystem().currentTimeInMillis());
-        return controller.isWithinTolerance();
+//        return controller.isWithinTolerance();
+        return false;
     }
 
     @Override
     public void end() {
+        System.out.println("done");
         controller.disable();
         drivetrain.stop();
     }

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frc4931.robot.Conveyor.Conveyor;
 import org.frc4931.robot.Conveyor.ConveyorCollect;
+import org.frc4931.robot.Conveyor.ConveyorEjectWhile;
 import org.frc4931.robot.Conveyor.ConveyorShootWhile;
 import org.frc4931.robot.auto.*;
 import org.frc4931.robot.climber.ClimbDownWhile;
@@ -17,6 +18,7 @@ import org.frc4931.robot.climber.ClimberSubSystem;
 import org.frc4931.robot.components.HardwarePixy;
 import org.frc4931.robot.components.NavXCompass;
 import org.frc4931.robot.drive.Drivetrain;
+import org.frc4931.robot.drive.TurnTo;
 import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.Executor;
 import org.strongback.Strongback;
@@ -76,9 +78,10 @@ public class Robot extends IterativeRobot {
         DistanceSensor frontDistanceSensorA = Hardware.DistanceSensors.analogUltrasonic(FRONT_ULTRASONIC_A_ANALOG_PORT, 102.4);
         DistanceSensor frontDistanceSensorB = Hardware.DistanceSensors.analogUltrasonic(FRONT_ULTRASONIC_B_ANALOG_PORT, 102.4);
         DistanceSensor rearDistanceSensor = Hardware.DistanceSensors.analogUltrasonic(REAR_ULTRASONIC_ANALOG_PORT, 102.4);
-        DistanceSensor frontDistanceSensor = DistanceSensor.create(
-                () -> Math.min(frontDistanceSensorA.getDistanceInInches(), frontDistanceSensorB.getDistanceInInches())
-        );
+//        DistanceSensor frontDistanceSensor = DistanceSensor.create(
+//                () -> Math.min(frontDistanceSensorA.getDistanceInInches(), frontDistanceSensorB.getDistanceInInches())
+//        );
+        DistanceSensor frontDistanceSensor = frontDistanceSensorB;
         MecanumDrive drive = new MecanumDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor, compass);
         drivetrain = new Drivetrain(drive, compass, frontDistanceSensor, rearDistanceSensor);
         drivetrain.zeroHeading();
@@ -128,6 +131,7 @@ public class Robot extends IterativeRobot {
         Switch shoot = flightStick.getButton(5);
         Switch climbUp = flightStick.getButton(6);
         Switch climbDown = flightStick.getButton(4);
+        Switch eject = flightStick.getButton(12);
 
         Strongback.switchReactor().onTriggered(relativeToggle, drivetrain::toggleRelativeEnabled);
         Strongback.switchReactor().onTriggered(zeroHeading, drivetrain::zeroHeading);
@@ -135,6 +139,7 @@ public class Robot extends IterativeRobot {
         Strongback.switchReactor().onTriggeredSubmit(shoot, () -> new ConveyorShootWhile(conveyor, shoot, 4800));
         Strongback.switchReactor().onTriggeredSubmit(climbUp, () -> new ClimbUpWhile(climber, climbUp));
         Strongback.switchReactor().onTriggeredSubmit(climbDown, () -> new ClimbDownWhile(climber, climbDown));
+        Strongback.switchReactor().onTriggeredSubmit(eject, () -> new ConveyorEjectWhile(conveyor, eject));
 
         autoChooser = new SendableChooser<>();
         autoChooser.addDefault("Do nothing", AutoNoOp::new);
@@ -169,9 +174,11 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
+        Strongback.start();
         drivetrain.zeroHeading(); // Robot should always start with its back against the alliance wall
 
-        Strongback.submit(autoChooser.getSelected().get());
+//        Strongback.submit(autoChooser.getSelected().get());
+        Strongback.submit(new TurnTo(drivetrain, 60.0));
     }
 
     @Override

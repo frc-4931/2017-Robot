@@ -4,6 +4,9 @@ package org.frc4931.robot.Conveyor;
  * Created by jcrane on 1/28/17.
  */
 
+import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.PWM;
+import org.strongback.command.Command;
 import org.strongback.command.Requirable;
 import org.strongback.components.Motor;
 import org.strongback.components.SpeedSensor;
@@ -11,7 +14,7 @@ import org.strongback.control.Controller;
 
 public class Conveyor implements Requirable {
     private double intakeSpeed = 1.0;
-    private double shooterIdleSpeed = 1000;
+    private double shooterIdleSpeed = 1200;
     private final Controller shooter;
     private final Motor intake;
     private final SpeedSensor shooterSpeed;
@@ -74,5 +77,9 @@ public class Conveyor implements Requirable {
 
     public double getShooterSpeed() {
         return shooterSpeed.getSpeed();
+    }
+
+    public void eject() {
+        intake.setSpeed(-intakeSpeed);
     }
 }
