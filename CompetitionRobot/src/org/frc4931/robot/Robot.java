@@ -143,9 +143,10 @@ public class Robot extends IterativeRobot {
 
         autoChooser = new SendableChooser<>();
         autoChooser.addDefault("Do nothing", AutoNoOp::new);
-        autoChooser.addObject("Left gear", () -> new AutoGearLeft(drivetrain, visionSystem));
-        autoChooser.addObject("Center gear", () -> new AutoGearCenter(drivetrain, visionSystem));
-        autoChooser.addObject("Right gear", () -> new AutoGearRight(drivetrain, visionSystem));
+        autoChooser.addObject("Drive forward", () -> new AutoDrive(drivetrain));
+        autoChooser.addObject("Left gear", () -> new AutoGearLeft(drivetrain));
+        autoChooser.addObject("Center gear", () -> new AutoGearCenter(drivetrain));
+        autoChooser.addObject("Right gear", () -> new AutoGearRight(drivetrain));
         autoChooser.addObject("Shoot", () -> new AutoShoot(drivetrain, visionSystem, conveyor));
         SmartDashboard.putData("Auto Mode", autoChooser);
     }
@@ -177,8 +178,7 @@ public class Robot extends IterativeRobot {
         Strongback.start();
         drivetrain.zeroHeading(); // Robot should always start with its back against the alliance wall
 
-//        Strongback.submit(autoChooser.getSelected().get());
-        Strongback.submit(new TurnTo(drivetrain, 60.0));
+        Strongback.submit(autoChooser.getSelected().get());
     }
 
     @Override
