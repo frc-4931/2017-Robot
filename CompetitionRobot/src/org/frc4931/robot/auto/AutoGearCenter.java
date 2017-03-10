@@ -5,9 +5,9 @@ import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.command.CommandGroup;
 
 public class AutoGearCenter extends CommandGroup {
-    public AutoGearCenter(Drivetrain drivetrain, VisionSystem visionSystem) {
+    public AutoGearCenter(Drivetrain drivetrain) {
         sequentially(
-                new DriveToLift(drivetrain, visionSystem)
+                new DriveToLift(drivetrain, 2.5)
         );
     }
 }
