@@ -16,6 +16,12 @@ public class DriveToRearDistance extends Command {
         this.stopDistance = stopDistance;
     }
 
+    public DriveToRearDistance(Drivetrain drivetrain, double stopDistance, double timeout) {
+        super(timeout, drivetrain);
+        this.drivetrain = drivetrain;
+        this.stopDistance = stopDistance;
+    }
+
     @Override
     public boolean execute() {
         double error = stopDistance - drivetrain.getRearDistance();

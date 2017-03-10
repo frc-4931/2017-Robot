@@ -5,13 +5,19 @@ import org.strongback.command.Command;
 public class DriveToFrontDistance extends Command {
 
     private static final double TOLERANCE = 5.0;
-    private static final double DRIVE_SPEED = 0.3;
+    private static final double DRIVE_SPEED = 0.25;
 
     private final Drivetrain drivetrain;
     private final double stopDistance;
 
     public DriveToFrontDistance(Drivetrain drivetrain, double stopDistance) {
         super(drivetrain);
+        this.drivetrain = drivetrain;
+        this.stopDistance = stopDistance;
+    }
+
+    public DriveToFrontDistance(Drivetrain drivetrain, double stopDistance, double timeout) {
+        super(timeout, drivetrain);
         this.drivetrain = drivetrain;
         this.stopDistance = stopDistance;
     }

@@ -7,7 +7,7 @@ import org.strongback.command.CommandGroup;
 public class AutoGearCenter extends CommandGroup {
     public AutoGearCenter(Drivetrain drivetrain) {
         sequentially(
-                new DriveToLift(drivetrain)
+                new DriveToLift(drivetrain, 2.5)
         );
     }
 }

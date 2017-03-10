@@ -6,6 +6,6 @@ import org.strongback.command.CommandGroup;
 
 public class AutoDrive extends CommandGroup {
     public AutoDrive(Drivetrain drivetrain) {
-        sequentially(new DriveToRearDistance(drivetrain, 284.0));
+        sequentially(new DriveToRearDistance(drivetrain, 280.0, 4.0));
     }
 }

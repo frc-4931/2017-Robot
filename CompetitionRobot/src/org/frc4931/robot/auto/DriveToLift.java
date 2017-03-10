@@ -1,17 +1,19 @@
 package org.frc4931.robot.auto;
 
-import org.frc4931.robot.drive.DriveToFrontDistance;
 import org.frc4931.robot.drive.Drivetrain;
-import org.frc4931.robot.vision.VisionSystem;
 import org.strongback.command.Command;
 
-public class DriveToLift extends DriveToFrontDistance {
+public class DriveToLift extends Command {
     private static final double STOP_DISTANCE = 55.0;
-
     private final Drivetrain drivetrain;
 
     public DriveToLift(Drivetrain drivetrain) {
-        super(drivetrain, STOP_DISTANCE);
+        super(drivetrain);
+        this.drivetrain = drivetrain;
+    }
+
+    public DriveToLift(Drivetrain drivetrain, double timeout) {
+        super(timeout, drivetrain);
         this.drivetrain = drivetrain;
     }
 
