@@ -13,9 +13,8 @@ import org.strongback.components.SpeedSensor;
 import org.strongback.control.Controller;
 
 public class Conveyor implements Requirable {
-    private final Motor sweeper;
     private double intakeSpeed = 1.0;
-    private double shooterIdleSpeed = 600;
+    private double shooterIdleSpeed = 1200;
     private final Controller shooter;
     private final Motor intake;
     private final SpeedSensor shooterSpeed;
@@ -26,10 +25,9 @@ public class Conveyor implements Requirable {
      * @param intake  The Motor that is responsible for driving the conveyor intake.
      * @param shooterSpeed
      */
-    public Conveyor(Controller shooter, Motor intake, Motor sweeper, SpeedSensor shooterSpeed) {
+    public Conveyor(Controller shooter, Motor intake, SpeedSensor shooterSpeed) {
         this.shooter = shooter;
         this.intake = intake;
-        this.sweeper = sweeper;
         this.shooterSpeed = shooterSpeed;
     }
 
@@ -39,7 +37,6 @@ public class Conveyor implements Requirable {
     public void collect() {
         intake.setSpeed(intakeSpeed);
         shooter.withTarget(shooterIdleSpeed);
-        sweeper.setSpeed(1.0);
     }
 
     /**
@@ -50,7 +47,6 @@ public class Conveyor implements Requirable {
     public void shoot(double speedRPM) {
         intake.setSpeed(intakeSpeed);
         shooter.withTarget(speedRPM);
-        sweeper.setSpeed(1.0);
     }
 
     /**
@@ -59,7 +55,6 @@ public class Conveyor implements Requirable {
     public void stop() {
         shooter.withTarget(0);
         intake.stop();
-        sweeper.stop();
     }
 
     /**

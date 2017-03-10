@@ -8,29 +8,45 @@ import org.strongback.control.SoftwarePIDController;
 
 public class TurnTo extends Command {
     private static final double HEADING_TOLERANCE = 5.0;
-    private static final double TURN_SPEED = 0.3;
 
     private final Drivetrain drivetrain;
-    private final double heading;
+    private final Controller controller;
 
     public TurnTo(Drivetrain drivetrain, double heading) {
         super(drivetrain);
         this.drivetrain = drivetrain;
-        this.heading = heading;
+        controller = new SoftwarePIDController(
+                SoftwarePIDController.SourceType.DISTANCE,
+                drivetrain::getHeading,
+                (out) -> drivetrain.drive(0.0, 0.0, out)
+        )
+                .continuousInputs(true)
+                .withInputRange(0.0, 360.0)
+                .withTolerance(HEADING_TOLERANCE)
+                .withGains(
+                        SmartDashboard.getNumber("P", 0.0),
+                        SmartDashboard.getNumber("I", 0.0),
+                        SmartDashboard.getNumber("D", 0.0)
+                )
+                .withTarget(heading);
+    }
+
+    @Override
+    public void initialize() {
+        controller.enable();
     }
 
     @Override
     public boolean execute() {
-        double error = heading - drivetrain.getHeading();
-        if (Math.abs(error) > 180.0) {
-            error = 180 - error;
-        }
-        drivetrain.relativeDrive(0.0, 0.0, Math.copySign(error, TURN_SPEED));
-        return Math.abs(error) <= HEADING_TOLERANCE;
+        controller.executable().execute(Strongback.timeSystem().currentTimeInMillis());
+//        return controller.isWithinTolerance();
+        return false;
     }
 
     @Override
     public void end() {
+        System.out.println("done");
+        controller.disable();
         drivetrain.stop();
     }
 }

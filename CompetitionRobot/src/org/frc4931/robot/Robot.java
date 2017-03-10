@@ -44,7 +44,6 @@ public class Robot extends IterativeRobot {
     private static final int LEFT_CLIMBER_MOTOR_PWM_PORT = 0;
     private static final int RIGHT_CLIMBER_MOTOR_PWM_PORT  = 1;
     private static final int CONVEYOR_INTAKE_MOTOR_PWM_PORT = 2;
-    private static final int CONVEYOR_SWEEPER_MOTOR_PWM_PORT = 3;
 
     private static final int CLIMBER_HORIZONTAL_SWITCH_DIO_PORT = 0;
     private static final int CLIMBER_VERTICAL_SWITCH_DIO_PORT = 1;
@@ -89,14 +88,14 @@ public class Robot extends IterativeRobot {
 
         CANTalon shooterMotor = new CANTalon(CONVEYOR_SHOOTER_MOTOR_CAN_ID);
         shooterMotor.configEncoderCodesPerRev(1024);
+        shooterMotor.reverseOutput(true);
+        shooterMotor.reverseSensor(true);
         TalonController ballShooter = Hardware.Controllers.talonController(shooterMotor, 1.0, 0.0)
                 .setFeedbackDevice(TalonSRX.FeedbackDevice.QUADRATURE_ENCODER)
                 .setControlMode(TalonController.ControlMode.SPEED)
                 .withGains(0.009038, 0.0, 0.0);
         Motor conveyorIntake = Hardware.Motors.victorSP(CONVEYOR_INTAKE_MOTOR_PWM_PORT);
-        Motor conveyorSweeper = Hardware.Motors.victorSP(CONVEYOR_SWEEPER_MOTOR_PWM_PORT)
-                .invert();
-        conveyor = new Conveyor(ballShooter, conveyorIntake, conveyorSweeper, shooterMotor::getSpeed);
+        conveyor = new Conveyor(ballShooter, conveyorIntake, shooterMotor::getSpeed);
 
         Motor leftClimberMotor = Hardware.Motors.talon(LEFT_CLIMBER_MOTOR_PWM_PORT)
                 .invert();
@@ -144,11 +143,10 @@ public class Robot extends IterativeRobot {
 
         autoChooser = new SendableChooser<>();
         autoChooser.addDefault("Do nothing", AutoNoOp::new);
-        autoChooser.addObject("Drive forward", () -> new AutoDrive(drivetrain));
-//        autoChooser.addObject("Left gear", () -> new AutoGearLeft(drivetrain));
-        autoChooser.addObject("Center gear", () -> new AutoGearCenter(drivetrain));
-//        autoChooser.addObject("Right gear", () -> new AutoGearRight(drivetrain));
-//        autoChooser.addObject("Shoot", () -> new AutoShoot(drivetrain, visionSystem, conveyor));
+        autoChooser.addObject("Left gear", () -> new AutoGearLeft(drivetrain, visionSystem));
+        autoChooser.addObject("Center gear", () -> new AutoGearCenter(drivetrain, visionSystem));
+        autoChooser.addObject("Right gear", () -> new AutoGearRight(drivetrain, visionSystem));
+        autoChooser.addObject("Shoot", () -> new AutoShoot(drivetrain, visionSystem, conveyor));
         SmartDashboard.putData("Auto Mode", autoChooser);
     }
 
@@ -179,7 +177,8 @@ public class Robot extends IterativeRobot {
         Strongback.start();
         drivetrain.zeroHeading(); // Robot should always start with its back against the alliance wall
 
-        Strongback.submit(autoChooser.getSelected().get());
+//        Strongback.submit(autoChooser.getSelected().get());
+        Strongback.submit(new TurnTo(drivetrain, 60.0));
     }
 
     @Override
